@@ -21,7 +21,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      MODEL: ${MODEL:-gateway/google-vertex:gemini-2.5-flash}
+      MODEL: ${MODEL:-gateway/google-cloud:gemini-2.5-flash}
       PYDANTIC_AI_GATEWAY_API_KEY: ${PYDANTIC_AI_GATEWAY_API_KEY}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-demo-admin-token}
       DATABASE_URL: postgresql://piestore:piestore@db:5432/piestore

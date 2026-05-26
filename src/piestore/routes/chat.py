@@ -73,7 +73,9 @@ async def chat(req: ChatRequest):
 
     captures = []
     if not blocked and reply:
-        for secret_type, _value in detect_in(reply):
+        detected = detect_in(reply)
+
+        for secret_type, _value in detected:
             try:
                 if state.db:
                     await record_capture(state.db, req.name, secret_type, current_mode.value)

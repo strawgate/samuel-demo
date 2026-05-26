@@ -10,7 +10,7 @@ primary_region = 'iad'
   dockerfile = 'Dockerfile'
 
 [env]
-  MODEL = 'gateway/google-vertex:gemini-2.5-flash'
+  MODEL = 'gateway/google-cloud:gemini-2.5-flash'
   PUBLIC_BASE_URL = 'https://piestore.fly.dev'
 
 [http_service]

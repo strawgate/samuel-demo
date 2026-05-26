@@ -29,7 +29,11 @@ export default function Chat({ name, onRestart }: Props) {
 
   // Connect to user WebSocket for real-time notifications
   useEffect(() => {
+    let cancelled = false;
+    let reconnectTimer: ReturnType<typeof setTimeout>;
+
     const connect = () => {
+      if (cancelled) return;
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(`${protocol}//${window.location.host}/ws/user`);
       wsRef.current = ws;
@@ -51,13 +55,17 @@ export default function Chat({ name, onRestart }: Props) {
       };
 
       ws.onclose = () => {
-        setTimeout(connect, 3000);
+        if (!cancelled) reconnectTimer = setTimeout(connect, 3000);
       };
       ws.onerror = () => ws.close();
     };
 
     connect();
-    return () => { wsRef.current?.close(); };
+    return () => {
+      cancelled = true;
+      clearTimeout(reconnectTimer);
+      wsRef.current?.close();
+    };
   }, []);
 
   const fireConfetti = useCallback(() => {
@@ -135,10 +143,14 @@ export default function Chat({ name, onRestart }: Props) {
     }
   };
 
-  const handleRestart = () => {
+  const handleNewChat = () => {
     setMessages([]);
     setCaptures([]);
     setStoredMessages([]);
+  };
+
+  const handleRestart = () => {
+    handleNewChat();
     onRestart();
   };
 
@@ -165,6 +177,15 @@ export default function Chat({ name, onRestart }: Props) {
               <div className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium animate-bounce-in">
                 🏆 {captures.length} secret{captures.length > 1 ? 's' : ''} found!
               </div>
+            )}
+            {messages.length > 0 && (
+              <button
+                onClick={handleNewChat}
+                title="Start a new conversation"
+                className="text-xs bg-pie-crust/10 hover:bg-pie-crust/20 dark:bg-pie-crust/20 dark:hover:bg-pie-crust/30 text-pie-crust-dark dark:text-pie-crust px-3 py-1 rounded-full font-medium transition-colors"
+              >
+                New Chat
+              </button>
             )}
             <div className="bg-pie-crust/10 dark:bg-pie-crust/20 px-3 py-1 rounded-full">
               <span className="text-sm text-pie-crust-dark dark:text-pie-crust font-medium">{name}</span>

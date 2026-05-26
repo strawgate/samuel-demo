@@ -1,9 +1,11 @@
+import os
+
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     # Pydantic AI Gateway (primary)
-    model: str = "gateway/google-vertex:gemini-2.5-flash"
+    model: str = "gateway/google-cloud:gemini-2.5-flash"
     pydantic_ai_gateway_api_key: str = ""
 
     # Legacy: Direct Vertex AI (fallback if gateway key not set)
@@ -25,3 +27,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# pydantic-ai gateway provider reads directly from os.environ
+if settings.pydantic_ai_gateway_api_key:
+    os.environ.setdefault("PYDANTIC_AI_GATEWAY_API_KEY", settings.pydantic_ai_gateway_api_key)

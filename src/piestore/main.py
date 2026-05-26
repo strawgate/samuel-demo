@@ -40,6 +40,14 @@ async def lifespan(app: FastAPI):
     state.secrets = generate_secrets()
     logger.info(f"Secrets generated: {list(state.secrets.keys())}")
 
+    # Restore total_accesses from DB
+    if state.db:
+        import asyncpg
+
+        async with state.db.acquire() as conn:
+            count = await conn.fetchval("SELECT COUNT(*) FROM captures")
+            state.total_accesses = count or 0
+
     yield
 
     if state.db:

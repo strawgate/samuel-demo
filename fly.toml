@@ -1,21 +1,26 @@
-app = "piestore"
-primary_region = "iad"
+# fly.toml app configuration file generated for monty-demo on 2026-05-26T05:07:29Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'monty-demo'
+primary_region = 'iad'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  PUBLIC_BASE_URL = "https://piestore.fly.dev"
-  MODEL = "gateway/google-vertex:gemini-2.5-flash"
-  
+  MODEL = 'gateway/google-vertex:gemini-2.5-flash'
+  PUBLIC_BASE_URL = 'https://piestore.fly.dev'
+
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = 'off'
   auto_start_machines = true
   min_machines_running = 1
 
 [[vm]]
-  cpu_kind = "shared"
+  cpu_kind = 'shared'
   cpus = 2
   memory_mb = 1024

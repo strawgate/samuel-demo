@@ -77,8 +77,8 @@ export default function Dashboard({ token, onLogout }: Props) {
           } else if (data.type === 'access') {
             setState((prev) => prev ? { ...prev, total_accesses: data.total } : prev);
             setRecent((prev) => [data.event, ...prev].slice(0, 10));
-            getLeaderboard(token).then((lb) => setLeaderboard(lb.leaderboard)).catch(() => {});
-            getStats(token).then((st) => setStats(st)).catch(() => {});
+            getLeaderboard(token).then((lb) => setLeaderboard(lb.leaderboard)).catch((e) => console.error('getLeaderboard failed:', e));
+            getStats(token).then((st) => setStats(st)).catch((e) => console.error('getStats failed:', e));
           } else if (data.type === 'reset') {
             refresh();
           } else if (data.type === 'portal') {

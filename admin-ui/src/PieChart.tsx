@@ -97,14 +97,14 @@ export default function PieChart({ stats }: Props) {
             const pct = (d.value / stats.total) * 100;
             const color = d.name === 'Baseline' ? MODE_COLORS.mode1 :
                          d.name === 'Guardrails' ? MODE_COLORS.mode2 : MODE_COLORS.mode3;
-            return pct > 0 ? (
+            return (
               <div
                 key={d.name}
                 className="transition-all duration-500"
                 style={{ width: `${pct}%`, backgroundColor: color }}
                 title={`${d.name}: ${d.value} (${Math.round(pct)}%)`}
               />
-            ) : null;
+            );
           })}
         </div>
         <div className="flex justify-between mt-1 text-xs text-gray-500">

@@ -1,4 +1,5 @@
 import logging
+from itertools import islice
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -20,10 +21,12 @@ class ModeRequest(BaseModel):
 
 @router.post("/mode")
 async def set_mode(req: ModeRequest, _user=Depends(require_admin)):
-    if req.mode not in (1, 2, 3):
-        raise HTTPException(400, "mode must be 1, 2, or 3")
+    try:
+        new_mode = Mode(req.mode)
+    except ValueError:
+        raise HTTPException(400, f"mode must be one of {[m.value for m in Mode]}")
     async with state.mode_lock:
-        state.mode = Mode(req.mode)
+        state.mode = new_mode
     cfg = MODE_CONFIGS[state.mode]
     await broadcast({"type": "mode", "mode": state.mode.value, "label": cfg.label})
     # Notify users about mode change
@@ -41,7 +44,7 @@ async def set_mode(req: ModeRequest, _user=Depends(require_admin)):
 @router.get("/state")
 async def get_state(_user=Depends(require_admin)):
     cfg = MODE_CONFIGS[state.mode]
-    recent = [e.to_dict() for e in list(state.recent)[:10]]
+    recent = [e.to_dict() for e in islice(state.recent, 10)]
     return {
         "mode": state.mode.value,
         "mode_label": cfg.label,
@@ -80,23 +83,19 @@ async def stats(_user=Depends(require_admin)):
 
 
 @router.post("/login")
-async def login(token: str):
+async def login(token: str = Depends(require_admin)):
     """Simple token-based login for admin."""
-    from ..config import settings
-
-    if token != settings.admin_token:
-        raise HTTPException(401, "Invalid token")
     return {"ok": True}
 
 
 @router.post("/reset")
 async def reset_demo(_user=Depends(require_admin)):
     """Reset counters and leaderboard for a fresh demo run."""
-    state.total_accesses = 0
-    state.recent.clear()
     if state.db:
         async with state.db.acquire() as conn:
             await conn.execute("DELETE FROM captures")
+    state.total_accesses = 0
+    state.recent.clear()
     await broadcast({"type": "reset"})
     return {"ok": True}
 

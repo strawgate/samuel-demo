@@ -9,6 +9,15 @@ interface Props {
 export default function Counter({ total, recent }: Props) {
   const [displayIndex, setDisplayIndex] = useState(0);
 
+  // Clamp displayIndex when recent array shrinks
+  useEffect(() => {
+    if (recent.length === 0) {
+      setDisplayIndex(0);
+    } else if (displayIndex >= recent.length) {
+      setDisplayIndex(Math.max(0, recent.length - 1));
+    }
+  }, [recent.length, displayIndex]);
+
   // Rotate through recent events
   useEffect(() => {
     if (recent.length === 0) return;

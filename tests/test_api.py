@@ -28,16 +28,11 @@ def reset_state():
 @pytest.fixture
 def client():
     """Create test client without DB."""
-    from piestore.config import settings
-
-    # Disable DB entirely for tests
-    original_url = settings.database_url
-    settings.database_url = ""
     from piestore.main import app
 
-    with TestClient(app, raise_server_exceptions=False) as c:
-        yield c
-    settings.database_url = original_url
+    with patch("piestore.config.settings.database_url", ""):
+        with TestClient(app, raise_server_exceptions=False) as c:
+            yield c
 
 
 class TestNameEndpoint:
@@ -67,11 +62,17 @@ class TestAdminAuth:
         assert "secrets" in data
 
     def test_admin_login_valid(self, client):
-        resp = client.post("/api/admin/login?token=demo-admin-token")
+        resp = client.post(
+            "/api/admin/login",
+            headers={"Authorization": "Bearer demo-admin-token"},
+        )
         assert resp.status_code == 200
 
     def test_admin_login_invalid(self, client):
-        resp = client.post("/api/admin/login?token=wrong")
+        resp = client.post(
+            "/api/admin/login",
+            headers={"Authorization": "Bearer wrong"},
+        )
         assert resp.status_code == 401
 
 

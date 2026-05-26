@@ -50,7 +50,11 @@ export async function adminFetch(path: string, token: string, options?: RequestI
     if (res.status === 401) throw new Error('Unauthorized');
     throw new Error(`Request failed: ${res.status}`);
   }
-  return res.json();
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Failed to parse response (status ${res.status}): ${e instanceof Error ? e.message : e}`);
+  }
 }
 
 export async function getAdminState(token: string): Promise<AdminState> {

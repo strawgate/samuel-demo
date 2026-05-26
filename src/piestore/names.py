@@ -206,12 +206,14 @@ BANNED_WORDS: set[str] = set()
 
 def generate_display_name() -> str:
     """Generate a random display name like 'crimson-marmot'."""
-    color = random.choice(COLORS)
-    animal = random.choice(ANIMALS)
-    name = f"{color}-{animal}"
-    if name in BANNED_WORDS:
-        return generate_display_name()
-    return name
+    for _ in range(100):
+        color = random.choice(COLORS)
+        animal = random.choice(ANIMALS)
+        name = f"{color}-{animal}"
+        if name not in BANNED_WORDS:
+            return name
+    # Fallback: pick first non-banned combination
+    return f"{COLORS[0]}-{ANIMALS[0]}"
 
 
 def is_valid_name(name: str) -> bool:

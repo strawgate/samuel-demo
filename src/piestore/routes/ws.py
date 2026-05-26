@@ -1,10 +1,12 @@
 import json
 import logging
+import secrets as secrets_mod
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from ..state import state
 from ..config import settings
+from ..modes import MODE_CONFIGS
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ async def admin_websocket(ws: WebSocket):
     """WebSocket for real-time admin updates."""
     # Verify token from query params
     token = ws.query_params.get("token", "")
-    if token != settings.admin_token:
+    if not secrets_mod.compare_digest(token, settings.admin_token):
         await ws.close(code=4001, reason="unauthorized")
         return
 
@@ -26,8 +28,6 @@ async def admin_websocket(ws: WebSocket):
 
     try:
         # Send current state immediately
-        from ..modes import MODE_CONFIGS
-
         cfg = MODE_CONFIGS[state.mode]
         await ws.send_json(
             {
@@ -88,7 +88,10 @@ async def broadcast(message: dict) -> None:
     for ws in list(state.ws_clients):
         try:
             await ws.send_text(payload)
+        except WebSocketDisconnect:
+            dead.add(ws)
         except Exception:
+            logger.warning("Failed to send to admin WS client", exc_info=True)
             dead.add(ws)
 
     state.ws_clients -= dead
@@ -104,7 +107,10 @@ async def broadcast_to_users(message: dict) -> None:
     for ws in list(state.user_ws_clients):
         try:
             await ws.send_text(payload)
+        except WebSocketDisconnect:
+            dead.add(ws)
         except Exception:
+            logger.warning("Failed to send to user WS client", exc_info=True)
             dead.add(ws)
 
     state.user_ws_clients -= dead

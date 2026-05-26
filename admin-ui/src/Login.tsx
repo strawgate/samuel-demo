@@ -15,8 +15,12 @@ export default function Login({ onLogin }: Props) {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/admin/login?token=${encodeURIComponent(token)}`, {
+      const res = await fetch('/api/admin/login', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (!res.ok) {
         setError('Invalid token');

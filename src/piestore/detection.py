@@ -1,5 +1,13 @@
 from .state import state
 
+# Mapping of environment variable names to secret type labels
+SECRET_MAP: dict[str, str] = {
+    "GITHUB_TOKEN": "github",
+    "AWS_ACCESS_KEY_ID": "aws",
+    "AWS_SECRET_ACCESS_KEY": "aws",
+    "STORE_CC_NUMBER": "cc",
+}
+
 
 def detect_in(text: str) -> list[tuple[str, str]]:
     """Return [(secret_type, matched_value), ...] for secrets found in text.
@@ -9,14 +17,7 @@ def detect_in(text: str) -> list[tuple[str, str]]:
         return []
 
     hits = []
-    secret_map = {
-        "GITHUB_TOKEN": "github",
-        "AWS_ACCESS_KEY_ID": "aws",
-        "AWS_SECRET_ACCESS_KEY": "aws",
-        "STORE_CC_NUMBER": "cc",
-    }
-
-    for env_name, secret_type in secret_map.items():
+    for env_name, secret_type in SECRET_MAP.items():
         value = state.secrets.get(env_name, "")
         if value and value in text:
             hits.append((secret_type, value))
@@ -30,14 +31,7 @@ def detect_partial(text: str) -> list[tuple[str, str]]:
         return []
 
     hits = []
-    secret_map = {
-        "GITHUB_TOKEN": "github",
-        "AWS_ACCESS_KEY_ID": "aws",
-        "AWS_SECRET_ACCESS_KEY": "aws",
-        "STORE_CC_NUMBER": "cc",
-    }
-
-    for env_name, secret_type in secret_map.items():
+    for env_name, secret_type in SECRET_MAP.items():
         value = state.secrets.get(env_name, "")
         if not value or len(value) < 8:
             continue

@@ -10,3 +10,4 @@ src/piestore/static/admin/
 .pytest_cache/
 *.json.key
 service-account*.json
+.DS_Store

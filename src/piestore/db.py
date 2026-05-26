@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 import asyncpg
 
@@ -8,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 async def wait_for_db(database_url: str, timeout: float = 30) -> asyncpg.Pool:
     """Wait for Postgres to be ready, then return a connection pool."""
-    deadline = asyncio.get_event_loop().time() + timeout
+    deadline = time.monotonic() + timeout
     last_error = None
 
-    while asyncio.get_event_loop().time() < deadline:
+    while time.monotonic() < deadline:
         try:
             pool = await asyncpg.create_pool(database_url, min_size=2, max_size=10)
             logger.info("Connected to Postgres")

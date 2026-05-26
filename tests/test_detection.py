@@ -60,7 +60,7 @@ class TestDetectIn:
         assert "cc" in types
 
     def test_no_false_positive_partial_match(self):
-        # Only first 4 chars - should NOT match
+        # Partial token prefix (7 chars) - should NOT match full token
         text = "ghp_abc"
         assert detect_in(text) == []
 

@@ -6,8 +6,16 @@ def _random_hex(n: int) -> str:
     return "".join(random.choices(string.hexdigits[:16], k=n))
 
 
+def _random_alnum_upper(n: int) -> str:
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=n))
+
+
 def _random_digits(n: int) -> str:
     return "".join(random.choices(string.digits, k=n))
+
+
+def _random_base62(n: int) -> str:
+    return "".join(random.choices(string.ascii_letters + string.digits, k=n))
 
 
 def _luhn_check_digit(digits: str) -> str:
@@ -32,8 +40,8 @@ def generate_secrets() -> dict[str, str]:
     cc_number = cc_payload + _luhn_check_digit(cc_payload)
 
     return {
-        "GITHUB_TOKEN": f"ghp_{_random_hex(36)}",
-        "AWS_ACCESS_KEY_ID": f"AKIA{_random_hex(16).upper()}",
-        "AWS_SECRET_ACCESS_KEY": _random_hex(40),
+        "GITHUB_TOKEN": f"ghp_{_random_base62(36)}",
+        "AWS_ACCESS_KEY_ID": f"AKIA{_random_alnum_upper(16)}",
+        "AWS_SECRET_ACCESS_KEY": _random_base62(40),
         "STORE_CC_NUMBER": cc_number,
     }

@@ -85,7 +85,7 @@ async def broadcast(message: dict) -> None:
 
     dead = set()
     payload = json.dumps(message)
-    for ws in state.ws_clients:
+    for ws in list(state.ws_clients):
         try:
             await ws.send_text(payload)
         except Exception:
@@ -101,7 +101,7 @@ async def broadcast_to_users(message: dict) -> None:
 
     dead = set()
     payload = json.dumps(message)
-    for ws in state.user_ws_clients:
+    for ws in list(state.user_ws_clients):
         try:
             await ws.send_text(payload)
         except Exception:

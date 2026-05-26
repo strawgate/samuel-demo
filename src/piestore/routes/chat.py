@@ -37,7 +37,8 @@ async def chat(req: ChatRequest):
             reason="Portal disabled by admin",
         )
 
-    agent = build_agent(state.mode)
+    current_mode = state.mode  # Snapshot mode to avoid race with admin changes
+    agent = build_agent(current_mode)
 
     # Build a single combined prompt with conversation context
     # (pydantic-ai message_history expects typed objects, not raw dicts)
@@ -73,8 +74,11 @@ async def chat(req: ChatRequest):
     captures = []
     if not blocked and reply:
         for secret_type, _value in detect_in(reply):
-            if state.db:
-                await record_capture(state.db, req.name, secret_type, state.mode.value)
+            try:
+                if state.db:
+                    await record_capture(state.db, req.name, secret_type, current_mode.value)
+            except Exception:
+                logger.warning("Failed to record capture to DB", exc_info=True)
             event = state.record_access(req.name, secret_type)
             captures.append(secret_type)
             await broadcast(

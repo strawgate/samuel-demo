@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans text-white antialiased;
+  }
+}
+
+@layer components {
+  .mode-btn {
+    @apply px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 border-2 cursor-pointer;
+  }
+  .mode-btn-active {
+    @apply scale-105 shadow-lg shadow-pie-crust/30;
+  }
+  .stat-card {
+    @apply bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl p-6;
+  }
+}
+
+/* Pie chart animation */
+@keyframes pieSlice {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pie-animate {
+  animation: pieSlice 0.6s ease-out forwards;
+}
+
+/* Leaderboard row animation */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.leaderboard-row {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Counter pulse */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 165, 116, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(212, 165, 116, 0.5); }
+}
+
+.counter-glow {
+  animation: pulse-glow 2s infinite;
+}

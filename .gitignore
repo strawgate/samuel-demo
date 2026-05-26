@@ -7,4 +7,6 @@ dist/
 src/piestore/static/public/
 src/piestore/static/admin/
 *.egg-info/
-.pytest_cache
+.pytest_cache/
+*.json.key
+service-account*.json

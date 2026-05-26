@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: piestore
+          POSTGRES_PASSWORD: piestore
+          POSTGRES_DB: piestore
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U piestore"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://piestore:piestore@localhost:5432/piestore
+        run: uv run pytest tests/ -x -q --tb=short
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Ruff check
+        run: uv run ruff check src/ tests/
+
+      - name: Ruff format check
+        run: uv run ruff format --check src/ tests/
+
+  build-ui:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ui: [public-ui, admin-ui]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.ui }}
+        run: npm ci
+
+      - name: Build
+        working-directory: ${{ matrix.ui }}
+        run: npm run build
+
+      - name: Type check
+        working-directory: ${{ matrix.ui }}
+        run: npx tsc --noEmit

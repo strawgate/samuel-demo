@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body text-gray-800 dark:text-gray-100 antialiased;
+  }
+}
+
+@layer components {
+  .chat-bubble {
+    @apply rounded-2xl px-4 py-3 max-w-[85%] animate-slide-up;
+  }
+
+  .chat-bubble-user {
+    @apply bg-pie-crust text-white ml-auto rounded-br-md;
+  }
+
+  .chat-bubble-assistant {
+    @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 mr-auto rounded-bl-md shadow-sm border border-pie-crust/20 dark:border-gray-700;
+  }
+
+  .chat-bubble-system {
+    @apply bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 mx-auto text-center text-sm border border-red-200 dark:border-red-800 rounded-lg;
+  }
+
+  .chat-bubble-blocked {
+    @apply bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 mx-auto text-center text-sm border border-amber-200 dark:border-amber-800 rounded-lg;
+  }
+
+  .chat-bubble-capture {
+    @apply bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 mx-auto text-center text-sm border border-green-200 dark:border-green-800 rounded-lg font-medium;
+  }
+}
+
+/* Custom scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #D4A574;
+  border-radius: 3px;
+}
+
+/* Typing indicator */
+@keyframes typingDot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+
+.typing-dot {
+  animation: typingDot 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }

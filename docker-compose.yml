@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_USER: piestore
+      POSTGRES_PASSWORD: piestore
+      POSTGRES_DB: piestore
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U piestore"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports: ["8080:8080"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials.json
+      VERTEX_MODEL: ${VERTEX_MODEL:-gemini-2.5-flash}
+      VERTEX_PROJECT: ${VERTEX_PROJECT:-pydantic-platform}
+      VERTEX_LOCATION: ${VERTEX_LOCATION:-us-central1}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-demo-admin-token}
+      DATABASE_URL: postgresql://piestore:piestore@db:5432/piestore
+      PUBLIC_BASE_URL: http://localhost:8080
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-./credentials.json}:/app/credentials.json:ro
+
+volumes:
+  pgdata:

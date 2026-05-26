@@ -21,15 +21,11 @@ services:
       db:
         condition: service_healthy
     environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials.json
-      VERTEX_MODEL: ${VERTEX_MODEL:-gemini-2.5-flash}
-      VERTEX_PROJECT: ${VERTEX_PROJECT:-pydantic-platform}
-      VERTEX_LOCATION: ${VERTEX_LOCATION:-us-central1}
+      MODEL: ${MODEL:-gateway/google-vertex:gemini-2.5-flash}
+      PYDANTIC_AI_GATEWAY_API_KEY: ${PYDANTIC_AI_GATEWAY_API_KEY}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-demo-admin-token}
       DATABASE_URL: postgresql://piestore:piestore@db:5432/piestore
       PUBLIC_BASE_URL: http://localhost:8080
-    volumes:
-      - ${GOOGLE_APPLICATION_CREDENTIALS:-./credentials.json}:/app/credentials.json:ro
 
 volumes:
   pgdata:

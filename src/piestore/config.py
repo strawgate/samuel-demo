@@ -2,16 +2,15 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Vertex AI - either use service account JSON or gateway endpoints
+    # Pydantic AI Gateway (primary)
+    model: str = "gateway/google-vertex:gemini-2.5-flash"
+    pydantic_ai_gateway_api_key: str = ""
+
+    # Legacy: Direct Vertex AI (fallback if gateway key not set)
     google_application_credentials: str = ""
     vertex_model: str = "gemini-2.5-flash"
     vertex_project: str = "pydantic-platform"
     vertex_location: str = "us-central1"
-
-    # Logfire AI Gateway endpoints (optional, for DLP modes)
-    vertex_endpoint_enforce: str = ""
-    vertex_endpoint_observe: str = ""
-    vertex_api_key: str = ""
 
     # Postgres (local in container)
     database_url: str = "postgresql://piestore:piestore@localhost:5432/piestore"
